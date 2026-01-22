@@ -14,8 +14,10 @@ class FirebaseService
     public function __construct()
     {
         $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase/firebase_credentials.json'))
-            ->withDatabaseUri('https://apkcc-1ec07-default-rtdb.firebaseio.com');
+            ->withServiceAccount(
+                json_decode(env('FIREBASE_CREDENTIALS'), true)
+            )
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
 
         $this->database = $factory->createDatabase();
         $this->messaging = $factory->createMessaging();
