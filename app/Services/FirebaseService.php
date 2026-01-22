@@ -13,13 +13,25 @@ class FirebaseService
 
     public function __construct()
     {
-        $factory = (new Factory)
-            ->withServiceAccount(
-                json_decode(env('FIREBASE_CREDENTIALS'), true)
-            )
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+        $factory = new Factory();
 
-        $this->database = $factory->createDatabase();
+        if (env('FIREBASE_CREDENTIALS')) {
+            // Railway / Production (ENV JSON)
+            $factory = $factory->withServiceAccount(
+                json_decode(env('FIREBASE_CREDENTIALS'), true)
+            );
+        } else {
+            // Local development (file JSON)
+            $factory = $factory->withServiceAccount(
+                storage_path('app/firebase/firebase_credentials.json')
+            );
+        }
+
+        $factory = $factory->withDatabaseUri(
+            env('FIREBASE_DATABASE_URL')
+        );
+
+        $this->database  = $factory->createDatabase();
         $this->messaging = $factory->createMessaging();
     }
 
