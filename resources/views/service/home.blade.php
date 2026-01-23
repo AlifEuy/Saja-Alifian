@@ -220,6 +220,74 @@
             </div>
         @endif
 
+        @if(session('preview'))
+            <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <!-- HEADER (mirip update) -->
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-eye me-2"></i>Preview Data Servis
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- BODY (mirip form update, tapi readonly) -->
+                        <div class="modal-body">
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Plat Kendaraan</label>
+                                    <input type="text" class="form-control" value="{{ session('preview.plat') }}" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Jenis Kendaraan</label>
+                                    <input type="text" class="form-control" value="{{ session('preview.jenis') }}" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipe Servis</label>
+                                    <input type="text" class="form-control" value="{{ session('preview.tipe_service') }}"
+                                        readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">KM</label>
+                                    <input type="text" class="form-control"
+                                        value="{{ number_format(session('preview.km')) }} KM" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Biaya</label>
+                                    <input type="text" class="form-control fw-bold text-primary"
+                                        value="Rp {{ number_format(session('preview.biaya')) }}" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Tanggal Servis</label>
+                                    <input type="text" class="form-control" value="{{ session('preview.tanggal') }}"
+                                        readonly>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- FOOTER (BEDANYA DI SINI) -->
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-primary px-4" onclick="goHome()">
+                                OK
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @endif
+
+
         <!-- Form Publik -->
         <div class="form-card">
             <div class="form-header">
@@ -301,8 +369,23 @@
             <p>&copy; {{ date('Y') }} Layanan Servis Kendaraan</p>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+
+
+        window.onload = function () {
+            @if(session('preview'))
+                const modalEl = document.getElementById('previewModal');
+                if (modalEl && typeof bootstrap !== 'undefined') {
+                    new bootstrap.Modal(modalEl).show();
+                } else {
+                    console.error('Modal element or Bootstrap not found');
+                }
+            @endif
+};
+
+
         // Set tanggal default ke hari ini
         document.addEventListener('DOMContentLoaded', function () {
             const dateInput = document.querySelector('input[name="tanggal"]');
@@ -328,6 +411,38 @@
                 }, 5000);
             }
         });
+
+        window.addEventListener('load', function () {
+            @if(session('preview'))
+                var modalEl = document.getElementById('previewModal');
+                if (modalEl && window.bootstrap) {
+                    var modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                }
+            @endif
+        });
+
+        function closePreviewModal() {
+            const modalEl = document.getElementById('previewModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+
+            // CLEANUP MANUAL (INI KUNCI)
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+        function goHome() {
+            window.location.href = "/";
+        }
+
     </script>
 </body>
 

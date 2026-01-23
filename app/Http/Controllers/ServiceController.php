@@ -65,7 +65,15 @@ class ServiceController extends Controller
 
         // PUBLIK → KEMBALI KE HOMEPAGE
         return redirect('/')
-            ->with('success', 'Data servis berhasil dikirim');
+            ->with('success', 'Data servis berhasil dikirim')
+            ->with('preview', [
+                'plat' => $request->plat,
+                'jenis' => $request->jenis,
+                'tipe_service' => $request->tipe_service,
+                'biaya' => (int) $request->biaya,
+                'km' => (int) $request->km,
+                'tanggal' => $request->tanggal,
+            ]);
     }
 
     /*
@@ -119,5 +127,59 @@ class ServiceController extends Controller
 
         return redirect('/dashboard')
             ->with('success', 'Data berhasil disimpan');
+    }
+    public function update(Request $request)
+    {
+        $plat = $request->plat;
+
+        // ambil semua data
+        $services = $this->database
+            ->getReference('service_motor')
+            ->getValue();
+
+        if ($services) {
+            foreach ($services as $key => $service) {
+                if ($service['plat'] === $plat) {
+                    // update node yang sesuai
+                    $this->database
+                        ->getReference('service_motor/' . $key)
+                        ->update([
+                            'jenis' => $request->jenis,
+                            'tipe_service' => $request->tipe_service,
+                            'km' => (int) $request->km,
+                            'biaya' => (int) $request->biaya,
+                            'tanggal' => $request->tanggal,
+                        ]);
+                    break;
+                }
+            }
+        }
+
+        return redirect('/dashboard')
+            ->with('success', 'Data servis berhasil diperbarui');
+    }
+
+    public function destroy(Request $request)
+    {
+        $plat = $request->plat;
+
+        $services = $this->database
+            ->getReference('service_motor')
+            ->getValue();
+
+        if ($services) {
+            foreach ($services as $key => $service) {
+                if ($service['plat'] === $plat) {
+                    // hapus node berdasarkan firebase key
+                    $this->database
+                        ->getReference('service_motor/' . $key)
+                        ->remove();
+                    break;
+                }
+            }
+        }
+
+        return redirect('/dashboard')
+            ->with('success', 'Data servis berhasil dihapus');
     }
 }

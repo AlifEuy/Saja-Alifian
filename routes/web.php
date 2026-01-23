@@ -27,6 +27,10 @@ Route::post('/logout', function () {
     return redirect('/');
 });
 
+//update data
+Route::post('/service/update', [ServiceController::class, 'update']);
+Route::post('/service/delete', [ServiceController::class, 'destroy']);
+
 
 /*
 |--------------------------------------------------------------------------
